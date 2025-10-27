@@ -319,7 +319,7 @@ return [
         ],
         [
             'text' => 'Ver tickets',
-            'url' => 'admin/pages',
+            'url' => 'verTickets',
             'icon' => 'far fa-fw fa-file',
         ],
 
