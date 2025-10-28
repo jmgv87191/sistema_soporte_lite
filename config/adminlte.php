@@ -321,6 +321,14 @@ return [
             'text' => 'Ver tickets',
             'url' => 'verTickets',
             'icon' => 'far fa-fw fa-file',
+            'can'  => 'is-admin',
+        ],
+        [
+            'text' => 'Buscar ticket',
+            'url' => 'verTicketsUsuario',
+            'icon' => 'far fa-fw fa-file',
+            'can'  => 'is-user',
+
         ],
 
     ],

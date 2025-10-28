@@ -38,6 +38,10 @@ Route::get('/verTickets', function() {
     return view('tickets.verTickets');
 });
 
+Route::get('/verTicketsUsuario', function() {
+    return view('user.verTicket');
+});
+
 Route::get('/ticket/{code}', function($code) {
     return view('tickets.ticketDetalle');
 });
