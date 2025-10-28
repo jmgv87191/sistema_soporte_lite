@@ -26,7 +26,18 @@ Route::get('/crearTicket', function () {
     return view('tickets.index');
 })->middleware('auth')->name('tickets.index');
 
-Route::get('/verTickets', function () {
+/* Route::get('/verTickets', function () {
     return view('tickets.verTickets');
 })->middleware('auth')->name('tickets.verTickets');
 
+Route::get('/ticketDetalle', function () {
+    return view('tickets.ticketDetalle');
+})->middleware('auth')->name('tickets.ticketDetalle'); */
+
+Route::get('/verTickets', function() {
+    return view('tickets.verTickets');
+});
+
+Route::get('/ticket/{code}', function($code) {
+    return view('tickets.ticketDetalle');
+});
