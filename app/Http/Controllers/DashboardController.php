@@ -7,38 +7,42 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-
 class DashboardController extends Controller
 {
-    public function getStatistics()
+    public function getStatistics(Request $request)
     {
         $currentMonth = Carbon::now()->startOfMonth();
         $endOfMonth = $currentMonth->copy()->endOfMonth();
 
-        $totalTickets = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])->count();
-        
-        $activeTickets = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', '!=', 'resolved')
-            ->count();
-        
-        $resolvedTickets = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', 'resolved')
-            ->count();
-        
-        $avgResolutionTime = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
+        // 🔹 Filtro opcional por título
+        $title = $request->query('title');
+
+        // 🔹 Base query de tickets dentro del mes actual
+        $query = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth]);
+
+        // 🔹 Si el usuario selecciona un título, aplicamos el filtro
+        if ($title) {
+            $query->where('title', 'like', "%{$title}%");
+        }
+
+        // 🔹 Reutilizamos el query filtrado en todas las estadísticas
+        $tickets = (clone $query)->get();
+
+        $totalTickets = $tickets->count();
+        $activeTickets = $tickets->where('status', '!=', 'resolved')->count();
+        $resolvedTickets = $tickets->where('status', 'resolved')->count();
+
+        $avgResolutionTime = (clone $query)
             ->where('status', 'resolved')
             ->whereNotNull('completed_at')
             ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_time'))
-            ->value('avg_time')??0;
-        
+            ->value('avg_time') ?? 0;
+
         $statusDistribution = [
-            'open' => Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])->where('status', 'open')->count(),
-            'onprogress' => Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', 'onprogress')->count(),
-            'resolved' => Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', 'resolved')->count(),
-            'rejected' => Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', 'rejected')->count(),       
+            'open' => (clone $query)->where('status', 'open')->count(),
+            'onprogress' => (clone $query)->where('status', 'onprogress')->count(),
+            'resolved' => (clone $query)->where('status', 'resolved')->count(),
+            'rejected' => (clone $query)->where('status', 'rejected')->count(),
         ];
 
         $dashboardData = [
@@ -48,10 +52,10 @@ class DashboardController extends Controller
             'avg_resolution_time_hours' => round($avgResolutionTime, 1),
             'status_distribution' => $statusDistribution,
         ];
+
         return response()->json([
             'message' => 'Dashboard statistics retrieved successfully',
-            'data' => $dashboardData //diferente del video
+            'data' => $dashboardData,
         ], 200);
-
     }
 }

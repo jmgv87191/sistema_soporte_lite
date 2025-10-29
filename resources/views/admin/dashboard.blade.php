@@ -6,14 +6,13 @@
 @stop
 
 @section('content')
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard Admin</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-
     body {
       font-family: Arial, sans-serif;
       background: #f4f4f4;
@@ -40,23 +39,37 @@
       margin: 0 auto;
       max-width: 400px;
     }
-    #logout {
+    #filter {
       display: block;
       margin: 20px auto;
-      background-color: #d33;
-      color: white;
-      border: none;
-      padding: 10px 20px;
+      padding: 10px;
       border-radius: 5px;
-      cursor: pointer;
-    }
-    #logout:hover {
-      background-color: #b22;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <h1 style="margin: 50px 0;" >Dashboard - Administrador</h1>
+
+  <h1 style="margin: 50px 0;">Dashboard - Administrador</h1>
+
+  {{-- 🔹 FILTRO POR TÍTULO --}}
+  <div style="text-align: center;">
+    <label for="filter">Filtrar por tipo de problema:</label>
+    <select id="filter">
+      <option value="">-- Todos los tickets --</option>
+      <option value="teclado">Problemas con teclado</option>
+      <option value="mouse">Problemas con mouse</option>
+      <option value="monitor">Problemas con monitor</option>
+      <option value="cpu">Problemas con CPU</option>
+      <option value="impresora">Problemas con impresora</option>
+      <option value="red">Problemas de red o internet</option>
+      <option value="correo">Problemas con correo electrónico</option>
+      <option value="software">Problemas con software o aplicaciones</option>
+      <option value="instalacion">Solicitud de instalación de programas</option>
+      <option value="mantenimiento">Mantenimiento preventivo</option>
+    </select>
+  </div>
+
   <div class="stats">
     <div class="card">
       <h3>Total Tickets</h3>
@@ -74,12 +87,11 @@
 
   <canvas id="statusChart"></canvas>
 
-  <button id="logout">Cerrar sesión</button>
-
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("auth_token");
+    let chart; // Guardamos la instancia de la gráfica
 
+    async function cargarDashboard(filtro = "") {
       if (!token) {
         alert("No estás autenticado. Inicia sesión.");
         window.location.href = "/ticketspinoy/public/login";
@@ -87,10 +99,14 @@
       }
 
       try {
-        const res = await fetch("http://localhost/ticketspinoy/public/api/dashboard/statistics", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+        // 🔹 Construimos la URL con el parámetro de filtro si existe
+        let url = "http://localhost/ticketspinoy/public/api/dashboard/statistics";
+        if (filtro) {
+          url += "?title=" + encodeURIComponent(filtro);
+        }
+
+        const res = await fetch(url, {
+          headers: { "Authorization": `Bearer ${token}` }
         });
 
         const result = await res.json();
@@ -101,15 +117,16 @@
           return;
         }
 
-        // Mostrar los valores
         const data = result.data;
         document.getElementById("total_tickets").textContent = data.total_tickets;
         document.getElementById("active_tickets").textContent = data.active_tickets;
         document.getElementById("resolved_tickets").textContent = data.resolved_tickets;
 
-        // Gráfica de estado de tickets
+        // 🔹 Si ya hay una gráfica, destrúyela antes de crear otra
+        if (chart) chart.destroy();
+
         const ctx = document.getElementById("statusChart");
-        new Chart(ctx, {
+        chart = new Chart(ctx, {
           type: "doughnut",
           data: {
             labels: Object.keys(data.status_distribution),
@@ -130,30 +147,28 @@
         console.error("Error al cargar el dashboard:", error);
         alert("No se pudo conectar con el servidor.");
       }
+    }
+
+    // 🔹 Evento: cuando cambia el filtro, recarga los datos
+    document.getElementById("filter").addEventListener("change", (e) => {
+      const filtro = e.target.value;
+      cargarDashboard(filtro);
     });
 
-    document.getElementById("logout").addEventListener("click", () => {
-      console.log('loguot')
-/*       localStorage.removeItem("auth_token");
-      window.location.href = "/ticketspinoy/public/";
- */    });
+    // 🔹 Cargar dashboard al inicio
+    document.addEventListener("DOMContentLoaded", () => cargarDashboard());
   </script>
 </body>
 </html>
-
 @stop
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
 @stop
 
 @section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
 @stop
 
 <script>
-    const userRole = @json(auth()->user()->role);
-    console.log("Rol del usuario:", userRole);
-
+const userRole = @json(auth()->user()->role);
+console.log("Rol del usuario:", userRole);
 </script>
