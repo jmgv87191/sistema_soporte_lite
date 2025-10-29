@@ -10,30 +10,43 @@
 <form id="ticketForm">
     @csrf
 
-    {{-- 🔹 Selector de tipo de problema --}}
+    {{-- 🔹 Selector de categoría --}}
     <div class="form-group">
-        <label>Tipo de problema</label>
-        <select id="title" class="form-control" required>
-            <option value="">-- Selecciona un problema --</option>
-            <option value="teclado">Problemas con teclado</option>
-            <option value="mouse">Problemas con mouse</option>
-            <option value="monitor">Problemas con monitor</option>
-            <option value="CPU">Problemas con CPU</option>
-            <option value="impresora">Problemas con impresora</option>
-            <option value="internet">Problemas de red o internet</option>
-            <option value="software">Problemas con software o aplicaciones</option>
-            <option value="programas">Solicitud de instalación de programas</option>
-            <option value="Mantenimiento">Mantenimiento preventivo del equipo</option>
-            <option value="Otro tipo de problema">Otro tipo de problema</option>
+        <label>Categoría</label>
+        <select id="categoria" class="form-control" required>
+            <option value="">-- Selecciona una categoría --</option>
+            <option value="hardware">Hardware</option>
+            <option value="software">Software</option>
+            <option value="redes">Redes</option>
         </select>
     </div>
 
-    <div class="form-group">
-        <label>Descripción</label>
-        <textarea id="description" class="form-control" required placeholder="Describe el problema con detalle..."></textarea>
+    {{-- 🔹 Selector de tipo de problema según categoría --}}
+    <div class="form-group" id="tipoProblemaContainer" style="display:none;">
+        <label>Tipo de problema</label>
+        <select id="tipoProblema" class="form-control" required>
+            <option value="">-- Selecciona un problema --</option>
+        </select>
     </div>
 
-    {{-- 🔹 Prioridad fija en "Baja" (solo informativa y oculta) --}}
+    {{-- 🔹 Subproblemas dinámicos --}}
+    <div class="form-group" id="subproblemaContainer" style="display:none;">
+        <label>Detalle del problema</label>
+        <select id="detalleProblema" class="form-control" required>
+            <option value="">-- Selecciona una opción --</option>
+        </select>
+    </div>
+
+    {{-- 🔹 Campos manuales (solo si elige “otro”) --}}
+    <div class="form-group" id="otroProblemaContainer" style="display:none;">
+        <label>Especifica el tipo de problema</label>
+        <input type="text" id="otroTipo" class="form-control" placeholder="Ejemplo: Fuente de poder" />
+
+        <label class="mt-2">Detalle del problema</label>
+        <input type="text" id="otroDetalle" class="form-control" placeholder="Ejemplo: No enciende correctamente" />
+    </div>
+
+    {{-- 🔹 Prioridad fija en "Baja" (oculta) --}}
     <div class="form-group" style="visibility: hidden">
         <label>Prioridad</label>
         <input type="text" class="form-control" value="Baja" disabled>
@@ -44,112 +57,196 @@
     </button>
 </form>
 
-<div id="respuesta" class="mt-3"></div>
+{{-- 🔹 Modal de mensaje bloqueante --}}
+<div id="modalMensaje" 
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px 30px; border-radius:10px; position:relative; width:400px; text-align:center;">
+        <button id="cerrarModal" 
+                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:20px; cursor:pointer;">
+            &times;
+        </button>
+        <h4 id="modalTitulo"></h4>
+        <p id="modalTexto"></p>
+    </div>
+</div>
 @stop
 
 @section('js')
 <script>
+// 🔹 Datos de subproblemas según categoría
+const opcionesPorCategoria = {
+    hardware: {
+        cpu: ["El CPU no enciende", "El CPU se apaga", "El CPU se reinicia", "El CPU hace ruido"],
+        teclado: ["El teclado no funciona", "Algunas teclas no funcionan"],
+        mouse: ["El mouse no funciona nada", "El mouse funciona mal"],
+        regulador: ["El regulador hace ruido", "El regulador no funciona"],
+        monitor: ["El monitor no prende", "El monitor se ve mal"],
+        impresora: ["La impresora no prende", "Papel atascado","Imprime mal"],
+    },
+    software: {
+        software: ["Mi Office no funciona", "Windows se reinicia", "Pantalla azul", "Compaq con problemas"]
+    },
+    redes: {
+        redes: ["Mi cable no funciona","cable dañado", "No tengo internet"]
+    }
+};
+
+// 🔹 Cuando cambia la categoría
+document.getElementById('categoria').addEventListener('change', function() {
+    const cat = this.value;
+    const tipoContainer = document.getElementById('tipoProblemaContainer');
+    const tipoSelect = document.getElementById('tipoProblema');
+    const subContainer = document.getElementById('subproblemaContainer');
+    const subSelect = document.getElementById('detalleProblema');
+    const otroContainer = document.getElementById('otroProblemaContainer');
+
+    tipoSelect.innerHTML = '<option value="">-- Selecciona un problema --</option>';
+    subSelect.innerHTML = '<option value="">-- Selecciona una opción --</option>';
+    tipoContainer.style.display = 'none';
+    subContainer.style.display = 'none';
+    otroContainer.style.display = 'none';
+
+    if (!cat) return;
+
+    // Llenar tipo de problema según categoría
+    const tipos = Object.keys(opcionesPorCategoria[cat]);
+    tipos.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t;
+        option.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+        tipoSelect.appendChild(option);
+    });
+    tipoContainer.style.display = 'block';
+});
+
+// 🔹 Cuando cambia el tipo de problema
+document.getElementById('tipoProblema').addEventListener('change', function() {
+    const cat = document.getElementById('categoria').value;
+    const tipo = this.value;
+    const subContainer = document.getElementById('subproblemaContainer');
+    const subSelect = document.getElementById('detalleProblema');
+    const otroContainer = document.getElementById('otroProblemaContainer');
+
+    subSelect.innerHTML = '<option value="">-- Selecciona una opción --</option>';
+    subContainer.style.display = 'none';
+    otroContainer.style.display = 'none';
+
+    if (tipo === 'otro') {
+        otroContainer.style.display = 'block';
+    } else if (opcionesPorCategoria[cat][tipo]) {
+        opcionesPorCategoria[cat][tipo].forEach(texto => {
+            const option = document.createElement('option');
+            option.value = texto;
+            option.textContent = texto;
+            subSelect.appendChild(option);
+        });
+        subContainer.style.display = 'block';
+    }
+});
+
+// 🔹 Enviar ticket
 document.getElementById('enviar').addEventListener('click', async function() {
-    const token = localStorage.getItem('auth_token'); 
+    const token = localStorage.getItem('auth_token');
+    if (!token) { alert("No hay token guardado"); return; }
 
-    if (!token) {
-        alert("No hay token guardado en localStorage");
-        return;
+    const tipo = document.getElementById('tipoProblema').value.trim();
+    const detalle = document.getElementById('detalleProblema').value.trim();
+    const otroTipo = document.getElementById('otroTipo').value.trim();
+    const otroDetalle = document.getElementById('otroDetalle').value.trim();
+
+    let title = '';
+    let description = '';
+
+    if (tipo === 'otro') {
+        if (!otroTipo || !otroDetalle) { alert("Completa campos de problema personalizado"); return; }
+        title = otroTipo;
+        description = otroDetalle;
+    } else {
+        if (!tipo) { alert("Selecciona un tipo de problema"); return; }
+        title = tipo;
+        description = detalle ? detalle : tipo;
     }
 
-    const data = {
-        title: document.getElementById('title').value.trim(),
-        description: document.getElementById('description').value.trim(),
-        priority: "low"
-    };
-
-    if (!data.title || !data.description) {
-        alert("Completa todos los campos antes de enviar.");
-        return;
-    }
+    const data = { title, description, priority: "low" };
 
     try {
         const response = await fetch('/ticketspinoy/public/api/ticket', {
             method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token, 
-                "Accept": "application/json"
-            },
+            headers: { "Content-Type":"application/json","Authorization":"Bearer "+token,"Accept":"application/json" },
             body: JSON.stringify(data)
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            document.getElementById('respuesta').innerHTML = 
-                `<div class="alert alert-success">${result.message}</div>`;
+            mostrarModal(`✅ Ticket creado exitosamente`, `Tu código de ticket es: <strong>${result.data?.code || 'N/A'}</strong>`);
             document.getElementById('ticketForm').reset();
+            document.getElementById('tipoProblemaContainer').style.display='none';
+            document.getElementById('subproblemaContainer').style.display='none';
+            document.getElementById('otroProblemaContainer').style.display='none';
         } else {
-            document.getElementById('respuesta').innerHTML = 
-                `<div class="alert alert-danger">${result.message || 'Error al crear el ticket'}</div>`;
+            mostrarModal(`❌ Error`, result.message || 'Error al crear el ticket');
         }
-
-        console.log(result);
-    } catch (err) {
+    } catch(err) {
         console.error(err);
-        document.getElementById('respuesta').innerHTML = 
-            `<div class="alert alert-danger">Ocurrió un error en la conexión.</div>`;
+        mostrarModal(`⚠️ Error de conexión`, `Ocurrió un problema con la conexión al servidor.`);
     }
 });
-</script>
-@stop
 
-@section('js')
-<script>
-document.getElementById('enviar').addEventListener('click', async function() {
+// 🔹 Modal bloqueante
+function mostrarModal(titulo, mensaje) {
+    const modal = document.getElementById('modalMensaje');
+    document.getElementById('modalTitulo').innerHTML = titulo;
+    document.getElementById('modalTexto').innerHTML = mensaje;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+document.getElementById('cerrarModal').addEventListener('click', function() {
+    document.getElementById('modalMensaje').style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
 
-    const token = localStorage.getItem('auth_token'); 
 
-    if (!token) {
-        alert("No hay token guardado en localStorage");
-        return;
-    }
 
-    const data = {
-        title: document.getElementById('title').value.trim(),
-        description: document.getElementById('description').value.trim(),
-        priority: "low" // 🔹 Se fija la prioridad a "low"
-    };
 
-    if (!data.title || !data.description) {
-        alert("Completa todos los campos antes de enviar.");
-        return;
-    }
+/* logout */
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutBtn = document.querySelector('.logout-btn');
+    if(logoutBtn) {
+        logoutBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('auth_token');
+            if(!token) return alert('No hay token guardado');
 
-    try {
-        const response = await fetch('/ticketspinoy/public/api/ticket', {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token, 
-                "Accept": "application/json"
-            },
-            body: JSON.stringify(data)
+            try {
+                const res = await fetch('/ticketspinoy/public/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const result = await res.json();
+                if(res.ok) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/ticketspinoy/public/login';
+                } else {
+                    alert(result.message || 'Error al cerrar sesión');
+                }
+
+            } catch(err) {
+                console.error(err);
+                alert('Error de conexión');
+            }
         });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            document.getElementById('respuesta').innerHTML = 
-                `<div class="alert alert-success">${result.message}</div>`;
-            document.getElementById('ticketForm').reset();
-        } else {
-            document.getElementById('respuesta').innerHTML = 
-                `<div class="alert alert-danger">${result.message || 'Error al crear el ticket'}</div>`;
-        }
-
-        console.log(result);
-    } catch (err) {
-        console.error(err);
-        document.getElementById('respuesta').innerHTML = 
-            `<div class="alert alert-danger">Ocurrió un error en la conexión.</div>`;
     }
 });
+
+
+
 </script>
 @stop

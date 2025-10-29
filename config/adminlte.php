@@ -257,8 +257,8 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'admin/dashboard',
-    'logout_url' => '/login',
+    'dashboard_url' => '/',
+    'logout_url' => false,
     'login_url' => 'login',
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
@@ -328,8 +328,22 @@ return [
             'url' => 'verTicketsUsuario',
             'icon' => 'far fa-fw fa-file',
             'can'  => 'is-user',
-
         ],
+        [
+            'text' => 'Dashboard',
+            'url' => 'admin/dashboard',
+            'icon' => 'far fa-fw fa-file',
+            'can'  => 'is-admin',
+        ],
+        [
+            'text' => 'Cerrar sesión',
+            'icon' => 'fas fa-sign-out-alt',
+            'topnav_right' => true, // si quieres en la barra superior
+            'url' => '#',
+            'classes' => 'logout-btn' // clase personalizada
+        ],
+        
+        
 
     ],
 
