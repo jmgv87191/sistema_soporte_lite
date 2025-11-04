@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('code')->unique();
             $table->text('title');
+            $table->text('name');
+            $table->text('area');
             $table->longText('description');
             $table->enum('status', ['open', 'onprogress', 'resolved','rejected'])->default('open');
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');

@@ -8,10 +8,7 @@
 
 @section('content')
 
-<script>
-    const userRole = @json(auth()->user()->role);
-    console.log("Rol del usuario:", userRole);
-</script>
+
 
 @stop
 
@@ -23,9 +20,25 @@
 @section('js')
 
 
+
     <script>
+
+
+
+
 /* logout */
 document.addEventListener('DOMContentLoaded', function() {
+
+
+    const token = localStorage.getItem('auth_token');
+
+    if(!token){
+        alert("No hay token guardado.");
+        window.location.href = "/sistema_soporte_lite/public/login";
+        return;
+    } 
+
+
     const logoutBtn = document.querySelector('.logout-btn');
     if(logoutBtn) {
         logoutBtn.addEventListener('click', async function(e) {
@@ -34,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!token) return alert('No hay token guardado');
 
             try {
-                const res = await fetch('/ticketspinoy/public/api/logout', {
+                const res = await fetch('/sistema_soporte_lite/public/api/logout', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -47,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(res.ok) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user');
-                    window.location.href = '/ticketspinoy/public/login';
+                    window.location.href = '/sistema_soporte_lite/public/login';
                 } else {
                     alert(result.message || 'Error al cerrar sesión');
                 }
@@ -61,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-        
+
 
 
 
@@ -70,3 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @stop
 
+<script>
+    const userRole = @json(auth()->user()->role);
+    console.log("Rol del usuario:", userRole);
+</script>

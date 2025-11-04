@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Mis Tickets')
+@section('title', 'Tickets - Administración')
 
 @section('content_header')
     <h1>Listado de Tickets</h1>
@@ -12,9 +12,10 @@
             <thead>
                 <tr>
                     <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Área</th>
                     <th>Título</th>
                     <th>Descripción</th>
-                    <th>Prioridad</th>
                     <th>Estado</th>
                     <th>Fecha</th>
                 </tr>
@@ -30,12 +31,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('auth_token');
 
     if (!token) {
+        window.location.href = "/sistema_soporte_lite/public/login";
         alert("No hay token guardado. Inicia sesión primero.");
         return;
     }
 
     try {
-        const response = await fetch('http://localhost/ticketspinoy/public/api/ticket', {
+        const response = await fetch('http://localhost/sistema_soporte_lite/public/api/ticket', {
             method: 'GET',
             headers: {
                 "Authorization": "Bearer " + token,
@@ -52,37 +54,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data.data && data.data.length > 0) {
             data.data.forEach(ticket => {
                 const row = document.createElement('tr');
+
                 row.innerHTML = `
                     <td>${ticket.code}</td>
+                    <td>${ticket.name }</td>
+                    <td>${ticket.area }</td>
                     <td>${ticket.title}</td>
                     <td>${ticket.description}</td>
                     <td>
                         <span class="badge 
-                            ${ticket.priority === 'high' ? 'bg-danger' : 
-                            ticket.priority === 'medium' ? 'bg-warning' : 'bg-success'}">
-                            ${ticket.priority}
+                            ${ticket.status === 'open' ? 'bg-primary' :
+                            ticket.status === 'onprogress' ? 'bg-warning' :
+                            ticket.status === 'closed' ? 'bg-success' : 'bg-secondary'}">
+                            ${ticket.status ?? 'open'}
                         </span>
                     </td>
-                    <td>${ticket.status ?? 'open'}</td>
                     <td>${new Date(ticket.created_at).toLocaleString()}</td>
                 `;
 
                 row.style.cursor = 'pointer';
                 row.addEventListener('click', () => {
-                    window.location.href = `/ticketspinoy/public/ticket/${ticket.code}`;
+                    window.location.href = `/sistema_soporte_lite/public/ticket/${ticket.code}`;
                 });
 
                 tbody.appendChild(row);
             });
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay tickets disponibles</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay tickets disponibles</td></tr>';
         }
 
     } catch (error) {
         console.error("Error al cargar los tickets:", error);
     }
-
 });
+
 
 
 
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!token) return alert('No hay token guardado');
 
             try {
-                const res = await fetch('/ticketspinoy/public/api/logout', {
+                const res = await fetch('/sistema_soporte_lite/public/api/logout', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -109,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(res.ok) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user');
-                    window.location.href = '/ticketspinoy/public/login';
+                    window.location.href = '/sistema_soporte_lite/public/login';
                 } else {
                     alert(result.message || 'Error al cerrar sesión');
                 }
@@ -121,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
 
 </script>
 @stop

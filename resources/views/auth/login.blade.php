@@ -154,7 +154,7 @@ body {
     <input class='lf--submit' type='submit' value='LOGIN'>
     <!-- Botón de invitado -->
     <button type="button" id="guestLogin" class="lf--submit" style="margin-top: 10px; background: #3498db;">
-        INVITADO
+        CREAR TICKET
     </button>
 </form>
 
@@ -186,11 +186,11 @@ async function login(data) {
 
             const role = result.data.user.role;
             if (role === 'admin') {
-                window.location.href = "/ticketspinoy/public/admin/dashboard";
+                window.location.href = "/sistema_soporte_lite/public/admin/dashboard";
             } else if (role === 'user') {
-                window.location.href = "/ticketspinoy/public/user/dashboard";
+                window.location.href = "/sistema_soporte_lite/public/crearTicket";
             } else {
-                window.location.href = "/ticketspinoy/public/";
+                window.location.href = "/sistema_soporte_lite/public/";
             }
 
         } else {

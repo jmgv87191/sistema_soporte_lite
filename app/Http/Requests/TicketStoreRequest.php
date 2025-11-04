@@ -19,6 +19,9 @@ class TicketStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'priority' => 'required|string|in:low,medium,high',
+            'name' => 'required|string|max:255',
+            'area' => 'required|string|max:255',
+
         ];
     }
 }

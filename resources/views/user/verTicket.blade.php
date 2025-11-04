@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(!token){
         alert("No hay token guardado.");
+        window.location.href = "/sistema_soporte_lite/public/login";
         return;
     }
 
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch(`http://localhost/ticketspinoy/public/api/ticket/${code}`, {
+            const res = await fetch(`http://localhost/sistema_soporte_lite/public/api/ticket/${code}`, {
                 headers: { "Authorization": "Bearer " + token }
             });
 
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!token) return alert('No hay token guardado');
 
             try {
-                const res = await fetch('/ticketspinoy/public/api/logout', {
+                const res = await fetch('/sistema_soporte_lite/public/api/logout', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(res.ok) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user');
-                    window.location.href = '/ticketspinoy/public/login';
+                    window.location.href = '/sistema_soporte_lite/public/login';
                 } else {
                     alert(result.message || 'Error al cerrar sesión');
                 }

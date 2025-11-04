@@ -6,9 +6,126 @@
     <h1>Crear nuevo Ticket</h1>
 @stop
 
+@section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@stop
+
 @section('content')
+
+
 <form id="ticketForm">
     @csrf
+
+    <div class="form-group" id="nameContainer">
+        <label>Nombre</label>
+        <input type="text" id="name" class="form-control" placeholder="Juan" />
+    </div>
+
+{{--     <div class="form-group" id="areaContainer" >
+        <label>Area</label>
+        <input type="text" id="area" class="form-control" placeholder="general" />
+    </div> --}}
+
+
+        <div class="form-group">
+        <label for="area" >Area</label>
+        <select id="area" name="area" class="form-control" required>
+            <option value="">-- Selecciona el area a la que perteneces --</option>
+            <option value="DIRECTOR GENERAL">DIRECTOR GENERAL</option>
+            <option value="SECRETARÍA TÉCNICA">SECRETARÍA TÉCNICA</option>
+            <option value="SECRETARÍA EJECUTIVA">SECRETARÍA EJECUTIVA</option>
+            <option value="COORDINACIÓN DE POTABILIZACIÓN Y TRATAMIENTO">COORDINACIÓN DE POTABILIZACIÓN Y TRATAMIENTO</option>
+            <option value="DEPARTAMENTO DE MANTENIMIENTO GENERAL">DEPARTAMENTO DE MANTENIMIENTO GENERAL</option>
+            <option value="DEPARTAMENTO LABORATORIO">DEPARTAMENTO LABORATORIO</option>
+            <option value="DEPARTAMENTO DE CALIDAD Y PROCESOS DE PTAR">DEPARTAMENTO DE CALIDAD Y PROCESOS DE PTAR</option>
+            <option value="DEPARTAMENTO DE CALIDAD Y PROCESOS DE POTABILIZACIÓN">DEPARTAMENTO DE CALIDAD Y PROCESOS DE POTABILIZACIÓN</option>
+            <option value="UNIDAD DE APOYO ADMINISTRATIVO">UNIDAD DE APOYO ADMINISTRATIVO</option>
+            <option value="COORDINACIÓN DE SISTEMAS FORÁNEOS">COORDINACIÓN DE SISTEMAS FORÁNEOS</option>
+            <option value="UNIDAD DE MEJORA REGULATORIA">UNIDAD DE MEJORA REGULATORIA</option>
+            <option value="ASESORÍA JURÍDICA">ASESORÍA JURÍDICA</option>
+            <option value="CONTRALORÍA INTERNA">CONTRALORÍA INTERNA</option>
+            <option value="COMUNICACIÓN SOCIAL Y CULTURA DEL AGUA">COMUNICACIÓN SOCIAL Y CULTURA DEL AGUA</option>
+            <option value="DIRECCIÓN ADMINISTRATIVA Y FINANCIERA">DIRECCIÓN ADMINISTRATIVA Y FINANCIERA</option>
+            <option value="COORDINACIÓN DE RECURSOS FINANCIEROS">COORDINACIÓN DE RECURSOS FINANCIEROS</option>
+            <option value="DEPARTAMENTO DE TESORERÍA">DEPARTAMENTO DE TESORERÍA</option>
+            <option value="DEPARTAMENTO DE PROGRAMACIÓN Y PRESUPUESTO">DEPARTAMENTO DE PROGRAMACIÓN Y PRESUPUESTO</option>
+            <option value="DEPARTAMENTO DE CONTABILIDAD">DEPARTAMENTO DE CONTABILIDAD</option>
+            <option value="COORDINACIÓN DE RECURSOS MATERIALES">COORDINACIÓN DE RECURSOS MATERIALES</option>
+            <option value="DEPARTAMENTO DE ADQUISICIONES">DEPARTAMENTO DE ADQUISICIONES</option>
+            <option value="DEPARTAMENTO DE ALMACÉN">DEPARTAMENTO DE ALMACÉN</option>
+            <option value="DEPARTAMENTO DE INVENTARIOS">DEPARTAMENTO DE ALMACÉN</option>
+            <option value="DEPARTAMENTO DE TALLER Y PARQUE VEHICULAR">DEPARTAMENTO DE TALLER Y PARQUE VEHICULAR</option>
+            <option value="DEPARTAMENTO DE SERVICIOS GENERALES">DEPARTAMENTO DE SERVICIOS GENERALES</option>
+            <option value="DEPARTAMENTO DE ARCHIVO">DEPARTAMENTO DE ARCHIVO</option>
+            <option value="COORDINACIÓN DE RECURSOS HUMANOS">COORDINACIÓN DE RECURSOS HUMANOS</option>
+            <option value="DEPARTAMENTO DE ADMINISTRACIÓN DE PERSONAL">DEPARTAMENTO DE ADMINISTRACIÓN DE PERSONAL</option>
+            <option value="CONTRATACIÓN Y NÓMINA">CONTRATACIÓN Y NÓMINA</option>
+            <option value="CAPACITACIÓN Y EVALUACIÓN AL DESEMPEÑO">CAPACITACIÓN Y EVALUACIÓN AL DESEMPEÑO</option>
+            <option value="DEPARTAMENTO DE INFORMÁTICA">DEPARTAMENTO DE INFORMÁTICA</option>
+            <option value="UNIDAD DE SOPORTE TÉCNICO">UNIDAD DE SOPORTE TÉCNICO</option>
+            <option value="UNIDAD DE PROGRAMACIÓN">UNIDAD DE PROGRAMACIÓN</option>
+            <option value="UNIDAD DE APOYO ADMINISTRATIVO">UNIDAD DE APOYO ADMINISTRATIVO</option>
+            <option value="DIRECCIÓN COMERCIAL">DIRECCIÓN COMERCIAL</option>
+            <option value="COORDINACIÓN DE PADRÓN DE USUARIOS">COORDINACIÓN DE PADRÓN DE USUARIOS</option>
+            <option value="JEFATURA DE ADMINISTRACIÓN DEL PADRÓN DE USUARIOS">JEFATURA DE ADMINISTRACIÓN DEL PADRÓN DE USUARIOS</option>
+            <option value="JEFATURA DE CONTRATACIÓN">JEFATURA DE CONTRATACIÓN</option>
+            <option value="COORDINACIÓN DE FACTURACIÓN Y MEDICIÓN">COORDINACIÓN DE FACTURACIÓN Y MEDICIÓN</option>
+            <option value="JEFATURA DE MEDICIÓN">JEFATURA DE MEDICIÓN</option>
+            <option value="JEFATURA DE FACTURACIÓN">JEFATURA DE FACTURACIÓN</option>
+            <option value="COORDINACIÓN DEL CONTROL DEL REZAGO">COORDINACIÓN DEL CONTROL DEL REZAGO</option>
+            <option value="JEFATURA DE SANCIÓN A USUARIOS">JEFATURA DE SANCIÓN A USUARIOS</option>
+            <option value="JEFATURA DE REANUDACIÓN DE SERVICIOS">JEFATURA DE REANUDACIÓN DE SERVICIOS</option>
+            <option value="COORDINACIÓN DE ATENCIÓN A USUARIOS">COORDINACIÓN DE ATENCIÓN A USUARIOS</option>
+            <option value="JEFATURA DE CAJAS">JEFATURA DE CAJAS</option>
+            <option value="JEFATURA DE OFICINAS COMERCIALES">JEFATURA DE OFICINAS COMERCIALES</option>
+            <option value="UNIDAD DE APOYO ADMINISTRATIVO">UNIDAD DE APOYO ADMINISTRATIVO</option>
+            <option value="DIRECCIÓN OPERATIVA">DIRECCIÓN OPERATIVA</option>
+            <option value="COORDINACIÓN DE AGUA POTABLE">COORDINACIÓN DE AGUA POTABLE</option>
+            <option value="UNIDAD DE CONTROL Y TELEMETRÍA">UNIDAD DE CONTROL Y TELEMETRÍA</option>
+            <option value="DEPARTAMENTO DE CONTROL DE GARZAS Y DISTRIBUCIÓN DE AGUA EN PIPAS">
+                DEPARTAMENTO DE CONTROL DE GARZAS Y DISTRIBUCIÓN DE AGUA EN PIPAS</option>
+            <option value="DEPARTAMENTO DE REPARACIÓN DE FUGAS">DEPARTAMENTO DE REPARACIÓN DE FUGAS</option>
+            <option value="DEPARTAMENTO DE CONTROL DE VÁLVULAS, BASES DE BOMBEO Y TANQUES">DEPARTAMENTO DE CONTROL DE VÁLVULAS, BASES DE BOMBEO Y TANQUES</option>
+            <option value="CORDINACIÓN DE ALCANTARILLADO">CORDINACIÓN DE ALCANTARILLADO</option>
+            <option value="DEPARTAMENTO DE MANTENIMIENTO DE REDES Y ATENCIÓN A DERRAMES">
+                DEPARTAMENTO DE MANTENIMIENTO DE REDES Y ATENCIÓN A DERRAMES
+            </option>
+            <option value="DEPARTAMENTO DE OPERACIÓN DE CÁRCAMOS">
+                DEPARTAMENTO DE OPERACIÓN DE CÁRCAMOS
+            </option>
+            <option value="COORDINACIÓN DE ELECTROMECÁNICA">
+                COORDINACIÓN DE ELECTROMECÁNICA
+            </option>
+            <option value="UNIDAD DE APOYO TÉCNICO Y PLANEACIÓN">
+                UNIDAD DE APOYO TÉCNICO Y PLANEACIÓN
+            </option>
+            <option value="UNIDAD DE APOYO ADMINISTRATIVO">
+                UNIDAD DE APOYO ADMINISTRATIVO
+            </option>
+            <option value="DIRECCIÓN TÉCNICA">
+                DIRECCIÓN TÉCNICA
+            </option>
+            <option value="DEPARTAMENTO DE FACTIBILIDADES">
+                DEPARTAMENTO DE FACTIBILIDADES
+            </option>
+            <option value="DEPARTAMENTO DE ESTUDIOS Y PROYECTOS">
+                DEPARTAMENTO DE ESTUDIOS Y PROYECTOS
+            </option>
+            <option value="DEPARTAMENTO DE CONTRATACIÓN Y SEGUIMIENTO DE OBRA">
+                DEPARTAMENTO DE CONTRATACIÓN Y SEGUIMIENTO DE OBRA
+            </option>
+            <option value="DEPARTAMENTO DE CONTRATACIÓN Y SEGUIMIENTO DE OBRA">
+                DEPARTAMENTO DE CONSTRUCCIÓN
+            </option>
+            <option value="UNIDAD DE APOYO ADMINISTRATIVO">
+                UNIDAD DE APOYO ADMINISTRATIVO
+            </option>
+            <option value="UNIDAD DE PROMOCIÓN DE OBRAS">
+                UNIDAD DE PROMOCIÓN DE OBRAS
+            </option>
+        </select>
+    </div>
+
 
     {{-- 🔹 Selector de categoría --}}
     <div class="form-group">
@@ -73,7 +190,25 @@
 @stop
 
 @section('js')
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+// 🔹 Inicializar Select2
+$(document).ready(function() {
+    $('#area').select2({
+        width: 'resolve',
+        placeholder: 'Selecciona el área a la que perteneces',
+        theme: 'classic',
+        allowClear: true,
+    });
+});
+
+
 // 🔹 Datos de subproblemas según categoría
 const opcionesPorCategoria = {
     hardware: {
@@ -100,6 +235,8 @@ document.getElementById('categoria').addEventListener('change', function() {
     const subContainer = document.getElementById('subproblemaContainer');
     const subSelect = document.getElementById('detalleProblema');
     const otroContainer = document.getElementById('otroProblemaContainer');
+    const nameContainer = document.getElementById('nameContainer');
+    const areaContainer = document.getElementById('areaContainer');
 
     tipoSelect.innerHTML = '<option value="">-- Selecciona un problema --</option>';
     subSelect.innerHTML = '<option value="">-- Selecciona una opción --</option>';
@@ -154,6 +291,9 @@ document.getElementById('enviar').addEventListener('click', async function() {
     const detalle = document.getElementById('detalleProblema').value.trim();
     const otroTipo = document.getElementById('otroTipo').value.trim();
     const otroDetalle = document.getElementById('otroDetalle').value.trim();
+const name = document.getElementById('name').value.trim();
+const area = document.getElementById('area').value.trim();
+
 
     let title = '';
     let description = '';
@@ -168,10 +308,10 @@ document.getElementById('enviar').addEventListener('click', async function() {
         description = detalle ? detalle : tipo;
     }
 
-    const data = { title, description, priority: "low" };
+    const data = { title, description, priority: "low",name,area };
 
     try {
-        const response = await fetch('/ticketspinoy/public/api/ticket', {
+        const response = await fetch('/sistema_soporte_lite/public/api/ticket', {
             method: 'POST',
             headers: { "Content-Type":"application/json","Authorization":"Bearer "+token,"Accept":"application/json" },
             body: JSON.stringify(data)
@@ -207,8 +347,20 @@ document.getElementById('cerrarModal').addEventListener('click', function() {
     document.body.style.overflow = 'auto';
 });
 
+    document.addEventListener("DOMContentLoaded", () => cargarDashboard());
 
 
+        const token = localStorage.getItem("auth_token");
+
+    async function cargarDashboard(filtro = "") {
+        if (!token) {
+            alert("No estás autenticado. Inicia sesión.");
+            window.location.href = "/sistema_soporte_lite/public/login";
+            return;
+        }
+
+
+    }
 
 /* logout */
 document.addEventListener('DOMContentLoaded', function() {
@@ -220,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!token) return alert('No hay token guardado');
 
             try {
-                const res = await fetch('/ticketspinoy/public/api/logout', {
+                const res = await fetch('/sistema_soporte_lite/public/api/logout', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -233,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(res.ok) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user');
-                    window.location.href = '/ticketspinoy/public/login';
+                    window.location.href = '/sistema_soporte_lite/public/login';
                 } else {
                     alert(result.message || 'Error al cerrar sesión');
                 }
@@ -250,3 +402,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 @stop
+
+
+<script>
+    const userRole = @json(auth()->user()->role);
+    console.log("Rol del usuario:", userRole);
+</script>

@@ -92,6 +92,8 @@ class TicketController extends Controller
             $ticket->user_id = auth()->user()->id;
             $ticket->code = 'TIC-' . rand(100000, 999999);
             $ticket->title = $data['title'];
+            $ticket->name = $data['name'];
+            $ticket->area = $data['area'];
             $ticket->description = $data['description'];
             $ticket->priority = $data['priority'];
             $ticket->save();
@@ -102,7 +104,8 @@ class TicketController extends Controller
                 'data' => new TicketResource($ticket)
             ], 201);
 
-        }catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to create ticket',

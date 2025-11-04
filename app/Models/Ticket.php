@@ -10,6 +10,8 @@ class Ticket extends Model
         'user_id',
         'code',
         'title',
+        'name',
+        'area',
         'description',
         'status',
         'priority',
