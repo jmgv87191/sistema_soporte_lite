@@ -27,72 +27,77 @@
 
 @section('js')
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('auth_token');
+document.addEventListener('DOMContentLoaded', () => {
 
-    if (!token) {
-        window.location.href = "/sistema_soporte_lite/public/login";
-        alert("No hay token guardado. Inicia sesión primero.");
-        return;
-    }
+    async function cargarTickets() {
+        const token = localStorage.getItem('auth_token');
 
-    try {
-        const response = await fetch('http://localhost/sistema_soporte_lite/public/api/ticket', {
-            method: 'GET',
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Accept": "application/json"
-            }
-        });
-
-        const data = await response.json();
-        console.log(data);
-
-        const tbody = document.querySelector('#ticketsTable tbody');
-        tbody.innerHTML = '';
-
-        if (data.data && data.data.length > 0) {
-            data.data.forEach(ticket => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${ticket.code}</td>
-                    <td>${ticket.name }</td>
-                    <td>${ticket.area }</td>
-                    <td>${ticket.title}</td>
-                    <td>${ticket.description}</td>
-                    <td>
-                        <span class="badge 
-                            ${ticket.status === 'open' ? 'bg-primary' :
-                            ticket.status === 'onprogress' ? 'bg-warning' :
-                            ticket.status === 'closed' ? 'bg-success' : 'bg-secondary'}">
-                            ${ticket.status ?? 'open'}
-                        </span>
-                    </td>
-                    <td>${new Date(ticket.created_at).toLocaleString()}</td>
-                `;
-
-                row.style.cursor = 'pointer';
-                row.addEventListener('click', () => {
-                    window.location.href = `/sistema_soporte_lite/public/ticket/${ticket.code}`;
-                });
-
-                tbody.appendChild(row);
-            });
-        } else {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay tickets disponibles</td></tr>';
+        if (!token) {
+            window.location.href = "/sistema_soporte_lite/public/login";
+            alert("No hay token guardado. Inicia sesión primero.");
+            return;
         }
 
-    } catch (error) {
-        console.error("Error al cargar los tickets:", error);
+        try {
+            const response = await fetch('http://localhost/sistema_soporte_lite/public/api/ticket', {
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Accept": "application/json"
+                }
+            });
+
+            const data = await response.json();
+            console.log("Actualizado", new Date().toLocaleTimeString());
+
+            const tbody = document.querySelector('#ticketsTable tbody');
+            tbody.innerHTML = '';
+
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(ticket => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${ticket.code}</td>
+                        <td>${ticket.name }</td>
+                        <td>${ticket.area }</td>
+                        <td>${ticket.title}</td>
+                        <td>${ticket.description}</td>
+                        <td>
+                            <span class="badge 
+                                ${ticket.status === 'open' ? 'bg-primary' :
+                                ticket.status === 'onprogress' ? 'bg-warning' :
+                                ticket.status === 'closed' ? 'bg-success' : 'bg-secondary'}">
+                                ${ticket.status ?? 'open'}
+                            </span>
+                        </td>
+                        <td>${new Date(ticket.created_at).toLocaleString()}</td>
+                    `;
+
+                    row.style.cursor = 'pointer';
+                    row.addEventListener('click', () => {
+                        window.location.href = `/sistema_soporte_lite/public/ticket/${ticket.code}`;
+                    });
+
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay tickets disponibles</td></tr>';
+            }
+
+        } catch (error) {
+            console.error("Error al cargar los tickets:", error);
+        }
     }
-});
+
+    // ✅ Primera carga
+    cargarTickets();
+
+    // ✅ Recargar cada 3 segundos
+    setInterval(cargarTickets, 10000);
 
 
-
-
-/* logout */
-document.addEventListener('DOMContentLoaded', function() {
+    /* logout */
     const logoutBtn = document.querySelector('.logout-btn');
     if(logoutBtn) {
         logoutBtn.addEventListener('click', async function(e) {
@@ -126,6 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
 </script>
 @stop
+
